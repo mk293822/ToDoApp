@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('description')->nullable();          // Optional description
             $table->enum('status', ProjectEnums::cases())
                 ->default(ProjectEnums::PENDING->value);    // Status: pending, active, completed, archived
-            $table->uuid('owner_id')->nullable();              // Optional: original creator user ID
+            $table->foreignId('owner_id')->nullable()->constrained('users')->nullOnDelete(); // Project owner
             $table->string('type')->default('internal');      // Type: internal, client, personal, etc.
             $table->date('start_date')->nullable();            // Project start date
             $table->date('due_date')->nullable();              // Project deadline
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->decimal('budget', 12, 2)->nullable();
             $table->decimal('spent', 12, 2)->default(0);
             $table->enum('visibility', VisibilityEnums::cases())->default(VisibilityEnums::PRIVATE->value);
-            $table->timestamps();                               // created_at, updated_at
+            $table->timestamps();                              // created_at, updated_at
         });
 
     }

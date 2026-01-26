@@ -10,4 +10,20 @@ class Project extends Model
 {
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
     use HasFactory, HasUuids;
+
+    protected $fillable = [
+        'name', 'description', 'status',
+        'owner_id', 'type', 'start_date',
+        'due_date', 'priority', 'budget',
+        'spent', 'visibility'];
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class)->withTimestamps();
+    }
 }
