@@ -8,52 +8,78 @@ use App\Models\Task;
 use App\Models\Team;
 use App\Models\TeamUser;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-
-        User::factory()->create([
+        // Create an admin user
+        $admin = User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@gmail.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('password'), // Only for local/dev
         ]);
 
-        User::factory(10)->create();
+        // Create 10 additional users
+        $users = User::factory(10)->create();
 
-        Project::factory(10)->create()->each(function ($project) {
-            // Create between 5 to 10 tasks for each project
-            Task::factory(rand(5, 10))->create([
-                'project_id' => $project->id,
-            ]);
+        // Combine all users
+        $allUsers = $users->push($admin);
+
+        // Loop through all users to create projects and teams
+        $allUsers->each(function ($user) use ($allUsers) {
+            // Each user gets 1-3 projects
+            Project::factory(rand(1, 3))->create(['owner_id' => $user->id])
+                ->each(function ($project) use ($user, $allUsers) {
+                    // Create 5-10 tasks per project
+                    Task::factory(rand(5, 10))->create(['project_id' => $project->id]);
+
+                    // Create 1-3 teams per project
+                    Team::factory(rand(1, 3))->create(['owner_id' => $user->id])
+                        ->each(function ($team) use ($project, $user, $allUsers) {
+                            // Attach project owner to team as admin
+                            TeamUser::create([
+                                'team_id' => $team->id,
+                                'user_id' => $user->id,
+                                'role' => 'admin',
+                            ]);
+
+                            // Attach 1-4 random other users as members
+                            $randomUsers = $allUsers->where('id', '!=', $user->id)
+                                ->random(rand(1, min(4, $allUsers->count() - 1)));
+
+                            foreach ($randomUsers as $us) {
+                                TeamUser::create([
+                                    'team_id' => $team->id,
+                                    'user_id' => $us->id,
+                                    'role' => 'member',
+                                ]);
+                            }
+
+                            // Attach this team to the current project
+                            ProjectTeam::create([
+                                'team_id' => $team->id,
+                                'project_id' => $project->id,
+                            ]);
+
+                            // Optionally attach team to 1-2 other random projects
+                            $otherProjects = Project::where('id', '!=', $project->id)
+                                ->inRandomOrder()
+                                ->take(rand(1, 2))
+                                ->get();
+
+                            foreach ($otherProjects as $proj) {
+                                ProjectTeam::create([
+                                    'team_id' => $team->id,
+                                    'project_id' => $proj->id,
+                                ]);
+                            }
+                        });
+                });
         });
-
-        Team::factory(5)->create()->each(function ($team) {
-            // Assign between 3 to 7 users to each team
-            $users = User::inRandomOrder()->take(rand(3, 7))->get();
-            foreach ($users as $user) {
-                TeamUser::create([
-                    'team_id' => $team->id,
-                    'user_id' => $user->id,
-                ]);
-            }
-
-            $projects = Project::inRandomOrder()->take(rand(2, 5))->get();
-            foreach ($projects as $project) {
-                ProjectTeam::create([
-                    'team_id' => $team->id,
-                    'project_id' => $project->id,
-                ]);
-            }
-        });
-
     }
 }
