@@ -26,4 +26,9 @@ class Project extends Model
     {
         return $this->belongsToMany(Team::class)->withTimestamps();
     }
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
 }

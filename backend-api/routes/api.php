@@ -1,12 +1,19 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\Auth\AuthenticatedController;
+use App\Http\Controllers\Api\Auth\RegisteredUserController;
+use App\Http\Controllers\Api\ProjectController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Authentication Routes
+Route::post('/register', [RegisteredUserController::class, 'store']);
+Route::post('/login', [AuthenticatedController::class, 'login']);
 
-Route::get('/status', function () {
-    return response()->json(['status' => 'API is running fuck']);
+// Protected Routes
+Route::middleware('auth:sanctum')->group(function () {
+    // Authenticated User Routes
+    Route::post('/logout', [AuthenticatedController::class, 'logout']);
+
+    // Project Routes
+    Route::get('/projects', [ProjectController::class, 'index']);
 });
