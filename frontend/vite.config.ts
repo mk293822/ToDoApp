@@ -17,4 +17,14 @@ export default defineConfig({
     open: true,
     host: '0.0.0.0',
   },
+  root: './',
+  resolve: {
+    alias: {
+      '@': '/src',
+      '@components': '/src/components',
+      '@pages': '/src/pages',
+      '@assets': '/src/assets',
+      '@api': '/src/api',
+    },
+  },
 });
