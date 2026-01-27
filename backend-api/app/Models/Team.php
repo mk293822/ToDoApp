@@ -13,16 +13,16 @@ class Team extends Model
 
     protected $fillable = ['name', 'description', 'owner_id', 'visibility'];
 
-    public function users()
+    public function members()
     {
-        return $this->belongsToMany(User::class)
+        return $this->belongsToMany(User::class, 'team_users')
             ->withPivot('role')
             ->withTimestamps();
     }
 
     public function projects()
     {
-        return $this->belongsToMany(Project::class)->withTimestamps();
+        return $this->belongsToMany(Project::class, 'project_teams')->withTimestamps();
     }
 
     public function owner()

@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\Auth\AuthenticatedController;
 use App\Http\Controllers\Api\Auth\RegisteredUserController;
-use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // Authentication Routes
@@ -14,6 +14,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Authenticated User Routes
     Route::post('/logout', [AuthenticatedController::class, 'logout']);
 
-    // Project Routes
-    Route::get('/projects', [ProjectController::class, 'index']);
+    // Dashboard Routes
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 });

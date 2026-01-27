@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProjectResource extends JsonResource
+class TeamResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,17 +18,19 @@ class ProjectResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'status' => $this->status,
             'owner' => new UserResource($this->whenLoaded('owner')),
-            'tasks_count' => $this->tasks->count(),
-            'tasks' => TaskResource::collection($this->whenLoaded('tasks')),
-            'type' => $this->type,
-            'start_date' => optional($this->start_date)?->toDateString(),
-            'due_date' => optional($this->due_date)?->toDateString(),
-            'priority' => $this->priority,
-            'budget' => $this->budget,
-            'spent' => $this->spent,
             'visibility' => $this->visibility,
+            'members_count' => $this->members->count(),
+            'members' => $this->whenLoaded('members', function () {
+                return $this->members->map(function ($member) {
+                    return [
+                        'id' => $member->id,
+                        'name' => $member->name,
+                        'email' => $member->email,
+                        'role' => $member->pivot->role,
+                    ];
+                });
+            }),
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
         ];
