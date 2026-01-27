@@ -3,17 +3,27 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Auth\RegisterRequest;
+use App\Models\User;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class RegisteredUserController extends Controller
 {
-    public function store(RegisterRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        $data['password'] = bcrypt($data['password']);
-        $user = \App\Models\User::create($data);
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->string('password')),
+        ]);
         $token = $user->createToken('auth_token')->plainTextToken;
 
         event(new Registered($user));

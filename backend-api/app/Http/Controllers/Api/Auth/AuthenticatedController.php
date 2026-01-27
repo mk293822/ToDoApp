@@ -3,23 +3,18 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Auth\LoginRequest;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class AuthenticatedController extends Controller
 {
     public function login(LoginRequest $request)
     {
+        $request->authenticate();
         $data = $request->validated();
         $user = User::where('email', $data['email'])->first();
-
-        if (! $user || ! Hash::check($data['password'], $user->password)) {
-            return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
-        }
-
         $token = $user->createToken('auth_token')->plainTextToken;
 
         event(new Registered($user));
