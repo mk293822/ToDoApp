@@ -1,19 +1,20 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\AuthenticatedController;
-use App\Http\Controllers\Api\Auth\RegisteredUserController;
-use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Support\Facades\Route;
 
 // Authentication Routes
-Route::post('/register', [RegisteredUserController::class, 'store']);
-Route::post('/login', [AuthenticatedController::class, 'login']);
+Route::middleware('web')->group(function () {
+    Route::post('/register', [RegisteredUserController::class, 'store']);
+    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+    });
 
-// Protected Routes
+    // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
-    // Authenticated User Routes
-    Route::post('/logout', [AuthenticatedController::class, 'logout']);
-
+    Route::get('/user', [AuthenticatedSessionController::class, 'user']);
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
     // Dashboard Routes
     Route::get('/dashboard', [DashboardController::class, 'index']);
 });
