@@ -1,4 +1,4 @@
-import type { User } from '@/types/User';
+import type { User } from '@/types/main';
 
 export interface RegisterData {
   name: string;

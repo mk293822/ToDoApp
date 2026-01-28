@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '@/lib/api';
-import type { User } from '@/types/User';
+import type { User } from '@/types/main';
 import { getCsrfCookie } from '@/lib/csrf';
 import type { UseAuthInterface } from '@/interfaces/auth';
 
