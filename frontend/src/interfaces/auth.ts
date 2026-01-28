@@ -16,5 +16,12 @@ export interface UseAuthInterface {
   user: User | null;
   isAuthenticated: boolean;
   loading: boolean;
-  setUser: (user: User | null) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export interface FetchUserParams {
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  fetchCsrf?: boolean; // optional flag to fetch CSRF
 }

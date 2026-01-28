@@ -16,6 +16,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { getCsrfCookie } from '@/lib/csrf';
 import { useAuthContext } from '@/hooks/use-auth-context';
+import { fetchUser } from '@/helpers/fetch-user';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -23,7 +24,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const navigate = useNavigate();
-  const { setUser } = useAuthContext();
+  const { setUser, setLoading } = useAuthContext();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,10 +34,10 @@ const Login: React.FC = () => {
       await getCsrfCookie();
 
       // 2️⃣ Call login API
-      const { data } = await api.post('/login', { email, password });
+      await api.post('/login', { email, password });
 
       // 3️⃣ Fetch current user
-      setUser(data);
+      await fetchUser({ setUser, setLoading, fetchCsrf: false });
       // const { data } = await api.get('/user');
       navigate('/', { replace: true });
       // setSuccess(`Logged in as ${data.name}`);
