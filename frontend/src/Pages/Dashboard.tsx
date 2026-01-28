@@ -1,13 +1,12 @@
 import { useAuthContext } from '@/hooks/use-auth-context';
 import type { UseAuthInterface } from '@/interfaces/auth';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import api from '@/lib/api';
 
 const Dashboard = () => {
-  const { user }: UseAuthInterface = useAuthContext();
+  const { user, logout }: UseAuthInterface = useAuthContext();
 
   const handleLogout = async () => {
-    await api.post('/logout');
+    await logout();
     window.location.href = '/login';
   };
 

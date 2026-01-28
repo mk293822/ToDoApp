@@ -14,14 +14,15 @@ export interface LoginData {
 
 export interface UseAuthInterface {
   user: User | null;
-  isAuthenticated: boolean;
   loading: boolean;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export interface FetchUserParams {
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  fetchCsrf?: boolean; // optional flag to fetch CSRF
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<User | null>;
+  register: (
+    name: string,
+    email: string,
+    password: string,
+    password_confirmation: string,
+  ) => Promise<User | null>;
+  logout: () => Promise<void>;
+  fetchUser: (options?: { fetchCsrf?: boolean }) => Promise<User | null>;
 }

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import api from '@/lib/api';
 import axios from 'axios';
 import GuestLayout from '@/Layouts/GuestLayout';
 import {
@@ -14,9 +13,7 @@ import {
   FieldSet,
 } from '@/components/ui/field';
 import { Link, useNavigate } from 'react-router-dom';
-import { getCsrfCookie } from '@/lib/csrf';
 import { useAuthContext } from '@/hooks/use-auth-context';
-import { fetchUser } from '@/helpers/fetch-user';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
@@ -27,7 +24,7 @@ const Register: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const navigate = useNavigate();
-  const { setUser, setLoading } = useAuthContext();
+  const { register } = useAuthContext();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,20 +32,7 @@ const Register: React.FC = () => {
     setSuccess('');
 
     try {
-      await getCsrfCookie();
-
-      // 2️⃣ Call register API
-      await api.post('/register', {
-        name,
-        email,
-        password,
-        password_confirmation: passwordConfirmation,
-      });
-
-      // 3️⃣ Fetch current user
-      await api.get('/user');
-
-      await fetchUser({ setUser, setLoading, fetchCsrf: false });
+      await register(name, email, password, passwordConfirmation);
 
       setSuccess(`Registered and logged in`);
 
