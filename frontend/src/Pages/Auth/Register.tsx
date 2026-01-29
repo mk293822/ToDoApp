@@ -14,27 +14,30 @@ import {
 } from '@/components/ui/field';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/hooks/use-auth-context';
+import { useEventBus } from '@/hooks/use-event-bus';
+import type { NotificationEvents } from '@/types/event-bus';
+import { EVENT_NAMES } from '@/lib/event-names';
 
 const Register: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const navigate = useNavigate();
   const { register } = useAuthContext();
+  const { emit } = useEventBus<NotificationEvents>();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
 
     try {
       await register(name, email, password, passwordConfirmation);
 
-      setSuccess(`Registered and logged in`);
+      emit(EVENT_NAMES.SUCCESS_NOTIFICATION, {
+        message: 'Registration successful',
+        description: 'Your account has been created successfully.',
+      });
 
       navigate('/', { replace: true });
     } catch (err) {
@@ -42,10 +45,18 @@ const Register: React.FC = () => {
         if (err.response?.status === 422) {
           setFieldErrors(err.response.data.errors);
         } else {
-          setError(err.response?.data?.message || 'Login failed');
+          emit(EVENT_NAMES.ERROR_NOTIFICATION, {
+            message: err.response?.data?.message || 'Registration failed',
+            description:
+              'There was a problem creating your account. Please try again.',
+          });
         }
       } else {
-        setError('An unexpected error occurred');
+        emit(EVENT_NAMES.ERROR_NOTIFICATION, {
+          message: 'Registration failed',
+          description:
+            'There was a problem creating your account. Please try again.',
+        });
       }
     }
   };
@@ -60,9 +71,6 @@ const Register: React.FC = () => {
         <FieldGroup>
           <FieldSet>
             <FieldLegend className="text-center">Register</FieldLegend>
-
-            {error && <p className="text-red-500">{error}</p>}
-            {success && <p className="text-green-500">{success}</p>}
 
             <Field>
               <FieldLabel htmlFor="name">Name</FieldLabel>

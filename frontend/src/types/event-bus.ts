@@ -10,3 +10,5 @@ export type NotificationEvents = {
     description?: string;
   };
 };
+
+export type AppEvents = NotificationEvents;
