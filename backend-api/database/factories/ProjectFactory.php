@@ -23,7 +23,6 @@ class ProjectFactory extends Factory
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(),
             'status' => $this->faker->randomElement(ProjectEnums::cases())->value,
-            'owner_id' => \App\Models\User::factory(),
             'type' => $this->faker->randomElement(['internal', 'external']),
             'start_date' => $this->faker->date(),
             'due_date' => $this->faker->date(),

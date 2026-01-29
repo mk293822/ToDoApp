@@ -13,12 +13,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('teams', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->uuid('id')->primary()->unique();
             $table->string('name');
             $table->text('description')->nullable();
             $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
             $table->enum('visibility', VisibilityEnums::cases())
                 ->default(VisibilityEnums::PRIVATE->value);
+            $table->uuid('organization_id');
+            $table->foreign('organization_id')->references('id')->on('organizations')->cascadeOnDelete();
             $table->timestamps();
         });
 

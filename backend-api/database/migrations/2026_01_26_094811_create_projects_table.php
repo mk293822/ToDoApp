@@ -28,6 +28,8 @@ return new class extends Migration
             $table->decimal('budget', 12, 2)->nullable();
             $table->decimal('spent', 12, 2)->default(0);
             $table->enum('visibility', VisibilityEnums::cases())->default(VisibilityEnums::PRIVATE->value);
+            $table->uuid('organization_id');
+            $table->foreign('organization_id')->references('id')->on('organizations')->cascadeOnDelete();
             $table->timestamps();                              // created_at, updated_at
         });
 

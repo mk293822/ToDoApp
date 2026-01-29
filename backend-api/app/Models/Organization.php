@@ -5,28 +5,37 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
-class Team extends Model
+class Organization extends Model
 {
-    /** @use HasFactory<\Database\Factories\TeamFactory> */
+    /** @use HasFactory<\Database\Factories\OrganizationFactory> */
     use HasFactory, HasUuids;
 
-    protected $fillable = ['name', 'description', 'owner_id', 'visibility'];
+    protected $fillable = [
+        'name',
+        'description',
+        'owner_id',
+        'visibility',
+    ];
 
     protected $keyType = 'string';
     public $incrementing = false;
 
     public function members()
     {
-        return $this->belongsToMany(User::class, 'team_users')
+        return $this->belongsToMany(User::class, 'organization_users')
             ->withPivot('role')
             ->withTimestamps();
     }
 
     public function projects()
     {
-        return $this->belongsToMany(Project::class, 'project_teams')->withTimestamps();
+        return $this->hasMany(Project::class);
+    }
+
+    public function teams()
+    {
+        return $this->hasMany(Team::class);
     }
 
     public function owner()

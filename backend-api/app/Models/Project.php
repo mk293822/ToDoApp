@@ -10,12 +10,15 @@ class Project extends Model
 {
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
     use HasFactory, HasUuids;
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
         'name', 'description', 'status',
         'owner_id', 'type', 'start_date',
         'due_date', 'priority', 'budget',
         'spent', 'visibility'];
+
 
     public function tasks()
     {

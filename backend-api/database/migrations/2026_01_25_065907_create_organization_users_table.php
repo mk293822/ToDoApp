@@ -5,28 +5,23 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
-        Schema::create('team_users', function (Blueprint $table) {
+        Schema::create('organization_users', function (Blueprint $table) {
             $table->id();
-            $table->uuid('team_id');
-            $table->foreign('team_id')->references('id')->on('teams')->cascadeOnDelete();
+            $table->uuid('organization_id');
+            $table->foreign('organization_id')->references('id')->on('organizations')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->enum('role', RoleEnums::cases())->default(RoleEnums::MEMBER->value);
             $table->timestamps();
+
+            $table->unique(['organization_id', 'user_id']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('team_users');
+        Schema::dropIfExists('organization_user');
     }
 };
