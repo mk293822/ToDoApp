@@ -5,22 +5,22 @@ import react from '@vitejs/plugin-react';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react({
-      babel: {
-        plugins: [['babel-plugin-react-compiler']],
-      },
-    }),
-    tailwindcss(),
-  ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+    plugins: [
+        react({
+            babel: {
+                plugins: [['babel-plugin-react-compiler']],
+            },
+        }),
+        tailwindcss(),
+    ],
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, './src'),
+        },
     },
-  },
-  server: {
-    port: 3000,
-    open: true,
-    host: '0.0.0.0',
-  },
+    server: {
+        port: 3000,
+        open: true,
+        host: '0.0.0.0',
+    },
 });

@@ -1,14 +1,14 @@
-import type { EVENT_NAMES } from '@/lib/event-names';
+import type { EVENT_NAMES } from '@/event-names';
 
 export type NotificationEvents = {
-  [EVENT_NAMES.SUCCESS_NOTIFICATION]: {
-    message: string;
-    description?: string;
-  };
-  [EVENT_NAMES.ERROR_NOTIFICATION]: {
-    message?: string;
-    description?: string;
-  };
+    [EVENT_NAMES.SUCCESS_NOTIFICATION]: {
+        message: string;
+        description?: string;
+    };
+    [EVENT_NAMES.ERROR_NOTIFICATION]: {
+        message?: string;
+        description?: string;
+    };
 };
 
 export type AppEvents = NotificationEvents;

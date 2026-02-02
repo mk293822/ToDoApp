@@ -7,27 +7,30 @@ import {
     CardHeader,
     CardTitle,
 } from './ui/card';
+import type { Priority, ProjectStatus } from '@/types/enum';
 
 // Badge helpers
-const statusColor = (status: string) => {
+const statusColor = (status: ProjectStatus) => {
     switch (status) {
-        case 'Completed':
+        case 'completed':
             return 'bg-green-100 text-green-800';
-        case 'In Progress':
+        case 'in_progress':
             return 'bg-yellow-100 text-yellow-800';
-        case 'Pending':
+        case 'pending':
             return 'bg-red-100 text-red-800';
+        case 'archived':
+            return 'bg-blue-100 text-blue-800';
         default:
             return 'bg-gray-100 text-gray-800';
     }
 };
-const priorityColor = (priority: string) => {
+const priorityColor = (priority: Priority) => {
     switch (priority) {
-        case 'High':
+        case 'high':
             return 'bg-red-100 text-red-800';
-        case 'Medium':
+        case 'medium':
             return 'bg-yellow-100 text-yellow-800';
-        case 'Low':
+        case 'low':
             return 'bg-green-100 text-green-800';
         default:
             return 'bg-gray-100 text-gray-800';
@@ -40,7 +43,7 @@ const ProjectItem = ({ project }: { project: Project }) => {
             <CardHeader>
                 <CardTitle>{project.name}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2">
+            <CardContent className="flex gap-2 flex-col">
                 <p>
                     Status:{' '}
                     <span
@@ -59,6 +62,9 @@ const ProjectItem = ({ project }: { project: Project }) => {
                 </p>
                 <p>
                     Tasks: <strong>{project.tasks_count}</strong>
+                </p>
+                <p>
+                    Type: <strong className="capitalize">{project.type}</strong>
                 </p>
                 <p>
                     Start: {project.start_date} | Due: {project.due_date}

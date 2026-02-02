@@ -1,42 +1,50 @@
-import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import type { Project, Team, Organization } from '@/types/main';
+import type { User } from '@/types/main';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import api from '@/lib/api';
-import Sidebar from '@/components/Sidebar';
-import ProjectItem from '@/components/ProjectCard';
-import Loading from '@/components/Loading';
-import TeamCard from '@/components/TeamCard';
-import { EVENT_NAMES } from '@/lib/event-names';
+import { EVENT_NAMES } from '@/event-names';
 import { eventBus } from '@/lib/event-bus';
-import { EmptyCard } from '@/components/Empty';
-import OrganizationCard from '@/components/OrganizationCard';
+import MobileSidebar from '@/components/MobileSidebar';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAbortableEffect } from '@/hooks/use-abortable-effect';
+import axios from 'axios';
+import Loading from '@/components/Loading';
+import { useState } from 'react';
 
 export default function Dashboard() {
-    const [organizations, setOrganizations] = useState<Organization[]>([]);
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [teams, setTeams] = useState<Team[]>([]);
+    const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    useAbortableEffect((signal) => {
         const fetchData = async () => {
+            setLoading(true);
             try {
-                const res = await api.get('/dashboard');
-                // Make sure your API returns { organizations, projects, teams }
-                setOrganizations(res.data.organizations || []);
-                setProjects(res.data.projects || []);
-                setTeams(res.data.teams || []);
-            } catch (error) {
-                console.error('Error fetching dashboard data:', error);
+                const res = await api.get('/dashboard', { signal });
+                setUser(res.data.user);
+            } catch (err) {
+                if (axios.isCancel(err)) return;
+                if (err instanceof axios.AxiosError) {
+                    eventBus.emit(EVENT_NAMES.ERROR_NOTIFICATION, {
+                        message:
+                            err.response?.data?.message ||
+                            'Fetching Dashboard data failed!',
+                        description:
+                            'There was a problem fetching the dashboard data!',
+                    });
+                } else {
+                    eventBus.emit(EVENT_NAMES.ERROR_NOTIFICATION, {
+                        message: 'Fetch Dashboard data failed!',
+                        description:
+                            'There was a problem fetching the dashboard data!',
+                    });
+                }
             } finally {
                 setLoading(false);
             }
         };
         fetchData();
     }, []);
-
-    if (loading) return <Loading />;
 
     const handleAddProject = () => {
         eventBus.emit(EVENT_NAMES.SUCCESS_NOTIFICATION, {
@@ -45,83 +53,33 @@ export default function Dashboard() {
         });
     };
 
+    if (loading) return <Loading />;
+
     return (
         <AuthenticatedLayout title="Dashboard">
-            <div className="flex h-screen bg-gray-50">
-                {/* Sidebar */}
-                <Sidebar />
-
-                {/* Main Content */}
-                <main className="flex-1 p-6 overflow-y-auto">
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-3xl font-bold">Dashboard</h2>
-                        <Button onClick={handleAddProject}>
-                            <Plus className="w-4 h-4 mr-2" /> Add Project
-                        </Button>
+            {/* Main Content */}
+            <nav className="flex px-6 py-5 justify-between items-center border-b border-gray-200 pb-4">
+                <h2 className="text-xl font-bold flex-1">Dashboard</h2>
+                <div className="flex gap-4 flex-row justify-between items-center">
+                    <Button onClick={handleAddProject}>
+                        <Plus className="w-4 h-4 mr-2" /> Add Project
+                    </Button>
+                    <div className="sm:hidden">
+                        <MobileSidebar />
                     </div>
+                </div>
+            </nav>
 
-                    {/* Organizations Section */}
-                    <section className="mb-8">
-                        <h3 className="text-xl font-semibold mb-4">
-                            Organizations
-                        </h3>
-                        {organizations.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {organizations.map((org) => (
-                                    <OrganizationCard
-                                        key={org.id}
-                                        organization={org}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <EmptyCard
-                                title="No Organizations Yet"
-                                description="You haven't created or joined any organizations yet."
-                                createTitle="Create Organization"
-                            />
-                        )}
-                    </section>
-
-                    {/* Projects Section */}
-                    <section className="mb-8">
-                        <h3 className="text-xl font-semibold mb-4">Projects</h3>
-                        {projects.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {projects.map((project) => (
-                                    <ProjectItem
-                                        key={project.id}
-                                        project={project}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <EmptyCard
-                                title="No Projects Yet"
-                                description="You haven't created any projects yet. Get started by creating your first project."
-                                createTitle="Create Project"
-                            />
-                        )}
-                    </section>
-
-                    {/* Teams Section */}
-                    <section>
-                        <h3 className="text-xl font-semibold mb-4">Teams</h3>
-                        {teams.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {teams.map((team) => (
-                                    <TeamCard key={team.id} team={team} />
-                                ))}
-                            </div>
-                        ) : (
-                            <EmptyCard
-                                title="No Teams Yet"
-                                description="You haven't been involved in any teams yet. Get started by creating your first team."
-                                createTitle="Create Team"
-                            />
-                        )}
-                    </section>
-                </main>
+            <div className="grid grid-cols-4 p-4">
+                <Card className="hover:shadow-xl transition-transform hover:scale-[102%]">
+                    <CardHeader>
+                        <CardTitle>{user?.name}</CardTitle>
+                        <CardTitle>{user?.email}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex gap-2 flex-col">
+                        hello
+                    </CardContent>
+                </Card>
             </div>
         </AuthenticatedLayout>
     );

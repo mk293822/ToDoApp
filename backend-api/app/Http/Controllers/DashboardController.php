@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\OrganizationResource;
 use App\Http\Resources\ProjectResource;
 use App\Http\Resources\TeamResource;

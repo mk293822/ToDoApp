@@ -1,0 +1,4 @@
+.prettierrc
+composer.*
+vendor
+.vscode

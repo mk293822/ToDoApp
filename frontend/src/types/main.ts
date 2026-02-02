@@ -1,3 +1,5 @@
+import type { Priority, ProjectStatus } from './enum';
+
 export type User = {
     id: number;
     name: string;
@@ -28,13 +30,14 @@ export type Project = {
     id: number;
     name: string;
     description: string;
-    status: string;
+    status: ProjectStatus;
     tasks_count: number;
-    priority: string;
+    priority: Priority;
     start_date?: string;
     due_date?: string;
     tasks?: Task[];
     owner?: User;
+    type: string;
 };
 export type Team = {
     id: number;

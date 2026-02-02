@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/field';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '@/hooks/use-auth-context';
-import { EVENT_NAMES } from '@/lib/event-names';
+import { EVENT_NAMES } from '@/event-names';
 import { eventBus } from '@/lib/event-bus';
 
 const Login: React.FC = () => {
@@ -39,6 +39,7 @@ const Login: React.FC = () => {
 
             navigate('/', { replace: true });
         } catch (err) {
+            if (axios.isCancel(err)) return;
             if (err instanceof axios.AxiosError) {
                 if (err.response?.status === 422) {
                     setFieldErrors(err.response.data.errors);
